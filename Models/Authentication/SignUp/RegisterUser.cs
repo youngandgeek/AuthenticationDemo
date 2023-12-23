@@ -13,5 +13,12 @@ namespace AuthenticationDemo.Models.Authentication.SignUp
 
         [Required(ErrorMessage ="Password Is Required")]
         public string password { get; set; }
-    }
+
+        /**
+        
+        [Required("Password doesn't match")]
+        [Compare("password",ErrorMessage = "Password doesn't match")]
+        public string? ConfirmPassword { get; set; }
+    **/
+        }
 }

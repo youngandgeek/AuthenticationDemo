@@ -1,11 +1,17 @@
 ﻿using AuthenticationDemo.Models;
+using AuthenticationDemo.Models.Authentication.Login;
 using AuthenticationDemo.Models.Authentication.SignUp;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace AuthenticationDemo.Controllers
@@ -47,7 +53,8 @@ namespace AuthenticationDemo.Controllers
                 Email = registerUser.email,
                 SecurityStamp = Guid.NewGuid().ToString(),
             };
-            if (await _roleManager.RoleExistsAsync(role)) { 
+            if (await _roleManager.RoleExistsAsync(role))
+            {
 
                 var result = await _userManager.CreateAsync(user, registerUser.password);
                 if (!result.Succeeded)
@@ -57,7 +64,7 @@ namespace AuthenticationDemo.Controllers
 
 
                 }
-              
+
                 //add role
                 await _userManager.AddToRoleAsync(user, role);
 
@@ -71,7 +78,56 @@ namespace AuthenticationDemo.Controllers
                                   new Response { Status = "Error", Message = "This Role Already Exist" });
             }
         }
-    
+
+
+        [HttpPost]
+        [Route("login")]
+        //pass the RegisterUserModel and the role
+        public async Task<IActionResult> Login([FromBody] LoginUser loginUser)
+        {
+            var user = await _userManager.FindByEmailAsync(loginUser.email);
+            if (user != null && await _userManager.CheckPasswordAsync(user, loginUser.password))
+            {
+                // User is authenticated successfully
+                var roles = await _userManager.GetRolesAsync(user);
+
+                // TODO: Add any additional authentication-related tasks here
+
+                // Generate a JWT token
+                var token = GenerateJwtToken(user, roles);
+
+                // Return success along with the token
+                return Ok(new { Token = token, Message = "Login successful" });
+            }
+
+            // Authentication failed
+            return Unauthorized(new { Message = "Invalid email or password" });
+        }
+
+        private string GenerateJwtToken(IdentityUser user, IList<string> roles)
+        {
+            // TODO: Implement your JWT token generation logic here
+            // You can use a library like System.IdentityModel.Tokens.Jwt for this purpose
+
+            // Example (using a hypothetical JwtSecurityTokenHandler):
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes("your-secret-key"); // Replace with a secure secret key
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[]
+                {
+            new Claim(ClaimTypes.Name, user.UserName),
+            new Claim(ClaimTypes.Email, user.Email),
+            // Add additional claims based on user roles or other attributes
+        }),
+                Expires = DateTime.UtcNow.AddHours(1), // Set token expiration time
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            // Create and write the token
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+        }
     }
 
 }
