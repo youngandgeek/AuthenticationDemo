@@ -1,5 +1,7 @@
 ﻿namespace AuthenticationDemo.Models
 {
+    //customized response message 
+
     public class Response
     {
         public string? Status { get; set; }

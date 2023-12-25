@@ -2,8 +2,11 @@
 
 namespace AuthenticationDemo.Models.Authentication.SignUp
 {
+    //We pass that model as a parameter in registration action method in Authenticationcontroller 
+
     public class RegisterUser
     {
+      //some constraints using data annotation 
         [Required(ErrorMessage = "Username Is Required")]
         public string username { get; set; }
         

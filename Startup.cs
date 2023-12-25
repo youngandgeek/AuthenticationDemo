@@ -45,7 +45,7 @@ namespace AuthenticationDemo
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();
 
-            //Add the Authentication
+            //Add the JWT Authentication
 
             services.AddAuthentication(options =>
             {
@@ -53,6 +53,8 @@ namespace AuthenticationDemo
                 options.DefaultChallengeScheme=JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultScheme=JwtBearerDefaults.AuthenticationScheme;
             });
+
+            //here by default
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
