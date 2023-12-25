@@ -2,6 +2,8 @@
 
 namespace AuthenticationDemo.Models.Authentication.Login
 {
+    //We pass that model as a parameter in Login action method in Authenticationcontroller 
+
     public class LoginUser
     {
         [EmailAddress]

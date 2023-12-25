@@ -4,6 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AuthenticationDemo.RepositoryLayer.Context
 {
+  /**this class to interact with database, since we're Authinticating users using Identity we Inherit from IdentityDbContext.
+   *IdentityDbContext includes tables for users, roles,and other identity-related information.
+   *The tables include fields such as Id, UserName, NormalizedUserName, PasswordHash, and others.
+    **/
 
     public class AppDbContext : IdentityDbContext<IdentityUser>
     {
@@ -11,15 +15,17 @@ namespace AuthenticationDemo.RepositoryLayer.Context
         {
 
         }
+     // Add your custom model configurations here ,ex: Fk and relations between db tables 
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
             //Add the roles by calling the SeedRole method
             SeedRoles(builder);
         }
 
-        //Add Roles to the AspNetUserRole default dentity table
+        //Add Roles to the AspNetUserRole default dentity table by Data seeding
         private static void SeedRoles(ModelBuilder builder)
         {
             builder.Entity<IdentityRole>().HasData(
